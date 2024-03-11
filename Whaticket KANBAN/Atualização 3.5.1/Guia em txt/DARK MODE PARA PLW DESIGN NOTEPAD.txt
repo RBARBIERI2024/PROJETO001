@@ -1,0 +1,134 @@
+Rodar no front: npm install react-query
+App.js // Trocar pelo antigo, renomear o antigo App_Backup.js
+=========================================================
+index.js // Pasta Layout trocar antigo pelo novo! Não se preocupe pois as alterções anteriores já estão no novo index.js que vai jogar.	  
+======================================================
+themeContext.js // Colocar dentro da pasta /frontend/layout/
+DarkMode // Jogar pasta DarkMode - /components
+
+Adicionando código CSS Dark Mode
+==================================================================================
+frontend/src/pages/TicketsCustom/index.js
+
+welcomeMsg: {
+		backgroundColor: theme.palette.boxticket, //DARK MODE PLW DESIGN//
+		display: "flex",
+		justifyContent: "space-evenly",
+		alignItems: "center",
+		height: "100%",
+		textAlign: "center",
+	},
+====================================================================================
+
+==================================================================================
+frontend/src/pages/SettingsCustom/index.js
+
+  tab: {
+    backgroundColor: theme.palette.options, //DARK MODE PLW DESIGN//
+    borderRadius: 4,
+  },
+====================================================================================
+
+==================================================================================
+/frontend/src/components/Settings/Options.js
+
+  tab: {
+    backgroundColor: theme.palette.options,  //DARK MODE PLW DESIGN//
+    borderRadius: 4,
+    width: "100%",
+    "& .MuiTab-wrapper": {
+      color: theme.palette.fontecor,  //DARK MODE PLW DESIGN//
+    },
+    "& .MuiTabs-flexContainer": {
+      justifyContent: "center"
+    }
+====================================================================================
+
+==================================================================================
+/frontend/src/components/MessagesList
+
+Linha 30: import whatsBackgroundDark from "../../assets/wa-background-dark.png"; //DARK MODE PLW DESIGN//
+
+Linha 48: 
+
+  messagesList: {
+    backgroundImage: theme.mode === 'light' ? `url(${whatsBackground})` : `url(${whatsBackgroundDark})`, //DARK MODE PLW DESIGN//
+    display: "flex",
+    flexDirection: "column",
+    flexGrow: 1,
+    padding: "20px 20px 20px 20px",
+    overflowY: "scroll",
+    ...theme.scrollbarStyles,
+  },
+
+====================================================================================
+
+==================================================================================
+/frontend/src/components/MessageInputCustom/index.js
+Só inserir a linha do background, trocando pela a antiga.
+
+ mainWrapper: {
+    backgroundColor: theme.palette.bordabox, //DARK MODE PLW DESIGN//
+	},
+
+ newMessageBox: {
+    backgroundColor: theme.palette.newmessagebox, //DARK MODE PLW DESIGN//
+	},
+	
+ messageInputWrapper: {
+    backgroundColor: theme.palette.inputdigita, //DARK MODE PLW DESIGN//
+	},
+====================================================================================
+
+====================================================================================
+frontend/src/components/ContactDrawer/index.js
+
+backgroundColor: "#eee", por
+backgroundColor: theme.palette.contactdrawer, //DARK MODE PLW DESIGN//
+
+====================================================================================
+
+====================================================================================
+/frontend/src/pages/Chat
+
+ChatList.js (LINHA 31) substituir por: backgroundColor: theme.palette.boxlist, //DARK MODE PLW DESIGN//
+Mesmo arquivo linha 113 substituir por: backgroundColor: chat.uuid === id ? "theme.palette.chatlist" : null,
+
+ChatMessages.js (LINHA 34) substituir por: backgroundColor: theme.palette.chatlist, //DARK MODE PLW DESIGN//
+Mesmo arquivo linha 60 substituir por: backgroundColor: theme.palette.boxchatlist, //DARK MODE PLW DESIGN//
+
+ChatPopover.js (TROCAR ANTIGO PELO NOVO)
+
+====================================================================================
+
+====================================================================================
+frontend/src/components/AnnouncementsPopover
+
+Arquivo index.js (TROCAR ANTIGO PELO NOVO)
+====================================================================================
+
+====================================================================================
+frontend/src/pages/Login
+
+Arquivo index.js
+
+backgroundColor: theme.palette.login, //DARK MODE PLW DESIGN//
+====================================================================================
+
+====================================================================================
+/frontend/src/components/CampaignModal
+
+Arquivo index.js 
+Estilizei o css e puxei a classe classes.tabmsg
+
+Coloque dentro do const useStyles = makeStyles((theme) => ({
+
+  tabmsg: {
+	  backgroundColor: theme.palette.campaigntab,
+  },
+ 
+Vá até a linha 483 dê ENTER e add a seguinte linha
+
+className={classes.tabmsg}
+====================================================================================
+

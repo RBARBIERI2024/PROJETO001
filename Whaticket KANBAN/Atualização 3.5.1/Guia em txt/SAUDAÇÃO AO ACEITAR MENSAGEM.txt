@@ -1,0 +1,204 @@
+MENSAGEM DE SAUDAÇÃO PLW DESIGN
+
+1- Inserir dados no frontend/src/components/Settings/Options.js
+
+Inserido na Linha 111:
+
+  // recursos a mais da plw design
+
+  const [SendGreetingAccepted, setSendGreetingAccepted] = useState("disabled");
+  const [loadingSendGreetingAccepted, setLoadingSendGreetingAccepted] = useState(false);
+  
+2- Inserir no mesmo arquivo:
+
+Linha 136:
+
+	  {/*PLW DESIGN SAUDAÇÃO*/}
+      const SendGreetingAccepted = settings.find((s) => s.key === "sendGreetingAccepted");
+      if (SendGreetingAccepted) {
+        setSendGreetingAccepted(SendGreetingAccepted.value);
+      }	 
+	  {/*PLW DESIGN SAUDAÇÃO*/}	  
+	  
+3- Inserir no mesmo arquivo:
+
+Linha 250:
+
+  {/*MENSAGEM DE SAUDAÇÃO PLW DESIGN*/}  
+  async function handleSendGreetingAccepted(value) {
+    setSendGreetingAccepted(value);
+    setLoadingSendGreetingAccepted(true);
+    await update({
+      key: "sendGreetingAccepted",
+      value,
+    });
+	toast.success("Operação atualizada com sucesso.");
+    setLoadingSendGreetingAccepted(false);
+  }  
+  {/*MENSAGEM DE SAUDAÇÃO PLW DESIGN*/}  	  
+  
+4- Inserir no mesmo arquivo: 
+
+Linha 434:
+
+		{/* ENVIAR SAUDAÇÃO AO ACEITAR O TICKET */}
+        <Grid xs={12} sm={6} md={4} item>
+          <FormControl className={classes.selectContainer}>
+            <InputLabel id="sendGreetingAccepted-label">Enviar saudação ao aceitar o ticket</InputLabel>
+            <Select
+              labelId="sendGreetingAccepted-label"
+              value={SendGreetingAccepted}
+              onChange={async (e) => {
+                handleSendGreetingAccepted(e.target.value);
+              }}
+            >
+              <MenuItem value={"disabled"}>Desabilitado</MenuItem>
+              <MenuItem value={"enabled"}>Habilitado</MenuItem>
+            </Select>
+            <FormHelperText>
+              {loadingSendGreetingAccepted && "Atualizando..."}
+            </FormHelperText>
+          </FormControl>
+        </Grid>
+		{/* ENVIAR SAUDAÇÃO AO ACEITAR O TICKET */}
+
+==========================================================================================		
+
+frontend/src/components/TicketListItemCustom/index.js
+
+1- Pode trocar ou colocar novos códigos.
+
+1.1- Na linha 187 estará assim: const TicketListItemCustom
+1.2- Agora necessario inserir handleChangeTab
+
+1.3- Linha 187 atualizada: const TicketListItemCustom = ({handleChangeTab, ticket }) => {
+
+2- Remove da Linha 223 até 275 e cole esse código:
+
+{/*CÓDIGO NOVO SAUDAÇÃO*/}
+  const handleCloseTicket = async (id) => {
+    setTag(ticket?.tags);
+    setLoading(true);
+    try {
+      await api.put(`/tickets/${id}`, {
+        status: "closed",
+        userId: user?.id,
+        queueId: ticket?.queue?.id
+      });
+    } catch (err) {
+      setLoading(false);
+      toastError(err);
+    }
+    if (isMounted.current) {
+      setLoading(false);
+    }
+    history.push(`/tickets/`);
+  };
+
+  const handleReopenTicket = async (id) => {
+    setLoading(true);
+    try {
+      await api.put(`/tickets/${id}`, {
+        status: "open",
+        userId: user?.id,
+        queueId: ticket?.queue?.id
+      });
+    } catch (err) {
+      setLoading(false);
+      toastError(err);
+    }
+    if (isMounted.current) {
+      setLoading(false);
+    }
+    history.push(`/tickets/`);
+  };
+
+    const handleAcepptTicket = async (id) => {
+        setLoading(true);
+        try {
+            await api.put(`/tickets/${id}`, {
+                status: "open",
+                userId: user?.id,
+            });
+
+            let settingIndex;
+
+            try {
+                const { data } = await api.get("/settings/");
+                settingIndex = data.filter((s) => s.key === "sendGreetingAccepted");
+            } catch (err) {
+                toastError(err);
+            }
+
+            if (settingIndex[0].value === "enabled" && !ticket.isGroup) {
+                handleSendMessage(ticket.id);
+            }
+
+        } catch (err) {
+            setLoading(false);
+            toastError(err);
+        }
+        if (isMounted.current) {
+            setLoading(false);
+        }
+
+        // handleChangeTab(null, "tickets");
+        handleChangeTab(null, "open");
+        history.push(`/tickets/${ticket.uuid}`);
+    };
+	
+	    const handleSendMessage = async (id) => {
+        const msg = `{{ms}} *{{name}}*, meu nome é *${user?.name}* e agora vou prosseguir com seu atendimento!`;
+        const message = {
+            read: 1,
+            fromMe: true,
+            mediaUrl: "",
+            body: `*Mensagem Automática:*\n${msg.trim()}`,
+        };
+        try {
+            await api.post(`/messages/${id}`, message);
+        } catch (err) {
+            toastError(err);
+        }
+    };
+	{/*CÓDIGO NOVO SAUDAÇÃO*/}
+	
+3- Na Linha 498 Adicionar handleChangeTab, igual está no exemplo abaixo!
+
+//PLW DESIGN INSERIDO O handleChangeTab
+onClick={e => handleAcepptTicket(ticket.id, handleChangeTab)}	
+
+====================================================================================
+
+/backend/src/services/CompanyService/CreateCompanyService.ts
+Add na Linha 193:
+
+ // Enviar mensagem ao aceitar ticket
+    await Setting.findOrCreate({
+	where:{
+      companyId: company.id,
+      key: "sendGreetingAccepted",
+    },
+    defaults: {
+      companyId: company.id,
+      key: "sendGreetingAccepted",
+      value: "disabled"
+    },
+  });
+====================================================================================
+
+/backend/src/database/seeds/20200904070007-create-default-settings.ts
+
+Na Linha 17 Add:
+						{
+						  key: "sendGreetingAccepted",
+						  value: "disabled",
+						  companyId: 1,
+						  createdAt: new Date(),
+						  updatedAt: new Date(),
+						  
+						},
+						
+====================================================================================
+
+Mover arquivo toastError.js para /backend/src/errors						

@@ -1,0 +1,23 @@
+Foi colocado dentro da backend:
+
+/backend/src/config
+
+redis.js
+
+=================================
+
+backend/src/libs
+
+cache.ts
+
+=================================
+
+backend/src/services/WbotServices
+
+providers.ts
+
+=================================
+
+backend/src/services/WbotServices
+
+wbotMessageListener.ts

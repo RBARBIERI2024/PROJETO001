@@ -1,0 +1,22 @@
+Inserir no arquivo index.js se localiza na pasta Layout
+Insira abaixo da linha 192
+
+//CACHÊ PLW DESIGN//
+    const handleRefreshPage = () => {
+    window.location.reload(false);
+  }
+//CACHÊ PLW DESIGN//
+==========================================================
+
+Add essa linha abaixo da 21 no arquivo index.js na pasta Layout
+import CachedIcon from "@material-ui/icons/Cached"; //ICONE DO CACHÊ//
+
+Inserir abaixo do icone de volume:
+
+		  <IconButton
+            onClick={handleRefreshPage}
+            aria-label={i18n.t("mainDrawer.appBar.refresh")}
+            color="inherit"
+          >
+            <CachedIcon style={{ color: "white" }} />
+          </IconButton>

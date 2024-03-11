@@ -1,0 +1,167 @@
+Options.js:
+
+  const [SettingsTransfTicket, setSettingsTransfTicket] = useState("disabled");
+  const [loadingSettingsTransfTicket, setLoadingSettingsTransfTicket] = useState(false);
+  
+  Linha 145:
+  
+  	  {/*TRANSFERIR TICKET*/}	
+	  const SettingsTransfTicket = settings.find((s) => s.key === "sendMsgTransfTicket");
+      if (SettingsTransfTicket) {
+        setSettingsTransfTicket(SettingsTransfTicket.value);
+      }
+	  {/*TRANSFERIR TICKET*/}	
+	  
+   Linha 263:
+   
+    async function handleSettingsTransfTicket(value) {
+    setSettingsTransfTicket(value);
+    setLoadingSettingsTransfTicket(true);
+    await update({
+      key: "sendMsgTransfTicket",
+      value,
+    });
+	toast.success("Operação atualizada com sucesso.");
+    setLoadingSettingsTransfTicket(false);
+  }
+  
+ Linha 478:
+ 
+		{/* ENVIAR MENSAGEM DE TRANSFERENCIA DE SETOR/ATENDENTE */}
+        <Grid xs={12} sm={6} md={4} item>
+          <FormControl className={classes.selectContainer}>
+            <InputLabel id="sendMsgTransfTicket-label">Enviar mensagem de transferencia de Fila/agente</InputLabel>
+            <Select
+              labelId="sendMsgTransfTicket-label"
+              value={SettingsTransfTicket}
+              onChange={async (e) => {
+                handleSettingsTransfTicket(e.target.value);
+              }}
+            >
+              <MenuItem value={"disabled"}>Desabilitado</MenuItem>
+              <MenuItem value={"enabled"}>Habilitado</MenuItem>
+            </Select>
+            <FormHelperText>
+              {loadingSettingsTransfTicket && "Atualizando..."}
+            </FormHelperText>
+          </FormControl>
+        </Grid>
+
+==========================================================================
+/backend/src/services/TicketServices
+Em UpdateTicketService.ts adicionar esse código:
+OBS: Substituir pelo antigo
+
+Linha 127 até 145
+
+const settingsTransfTicket = await ListSettingsServiceOne({ companyId: companyId, key: "sendMsgTransfTicket" });
+
+    if (settingsTransfTicket?.value === "enabled") {
+      // Mensagem de transferencia da FILA
+      if (oldQueueId !== queueId && oldUserId === userId && !isNil(oldQueueId) && !isNil(queueId)) {
+
+        const queue = await Queue.findByPk(queueId);
+        const wbot = await GetTicketWbot(ticket);
+        const msgtxt = "*Mensagem automática*:\nVocê foi transferido para o departamento *" + queue?.name + "*\naguarde, já vamos te atender!";
+
+        const queueChangedMessage = await wbot.sendMessage(
+          `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,
+          {
+            text: msgtxt
+          }
+        );
+        await verifyMessage(queueChangedMessage, ticket, ticket.contact);
+      }
+      else
+        // Mensagem de transferencia do ATENDENTE
+        if (oldUserId !== userId && oldQueueId === queueId && !isNil(oldUserId) && !isNil(userId)) {
+          const wbot = await GetTicketWbot(ticket);
+          const nome = await ShowUserService(ticketData.userId);
+          const msgtxt = "*Mensagem automática*:\nFoi transferido para o atendente *" + nome.name + "*\naguarde, já vamos te atender!";
+
+          const queueChangedMessage = await wbot.sendMessage(
+            `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,
+            {
+              text: msgtxt
+            }
+          );
+          await verifyMessage(queueChangedMessage, ticket, ticket.contact);
+        }
+        else
+          // Mensagem de transferencia do ATENDENTE e da FILA
+          if (oldUserId !== userId && !isNil(oldUserId) && !isNil(userId) && oldQueueId !== queueId && !isNil(oldQueueId) && !isNil(queueId)) {
+            const wbot = await GetTicketWbot(ticket);
+            const queue = await Queue.findByPk(queueId);
+            const nome = await ShowUserService(ticketData.userId);
+            const msgtxt = "*Mensagem automática*:\nVocê foi transferido para o departamento *" + queue?.name + "* e contará com a presença de *" + nome.name + "*\naguarde, já vamos te atender!";
+
+            const queueChangedMessage = await wbot.sendMessage(
+              `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,
+              {
+                text: msgtxt
+              }
+            );
+            await verifyMessage(queueChangedMessage, ticket, ticket.contact);
+          } else
+            if (oldUserId !== undefined && isNil(userId) && oldQueueId !== queueId && !isNil(queueId)) {
+
+              const queue = await Queue.findByPk(queueId);
+              const wbot = await GetTicketWbot(ticket);
+              const msgtxt = "*Mensagem automática*:\nVocê foi transferido para o departamento *" + queue?.name + "*\naguarde, já vamos te atender!";
+
+              const queueChangedMessage = await wbot.sendMessage(
+                `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,
+                {
+                  text: msgtxt
+                }
+              );
+              await verifyMessage(queueChangedMessage, ticket, ticket.contact);
+            }
+
+    }
+	
+=============================================================================================
+
+Add abaixo da mensagem de saudação:
+
+Em CreateCompanyService.ts
+
+ // Enviar mensagem de transferencia
+    await Setting.findOrCreate({
+	where:{
+      companyId: company.id,
+      key: "sendMsgTransfTicket",
+    },
+    defaults: {
+      companyId: company.id,
+      key: "sendMsgTransfTicket",
+      value: "disabled"
+    },
+ });
+ 
+ ==============================================================================================
+ 
+ Add no arquivo database, create-default-settings.ts
+ 
+ 						{
+						  key: "sendMsgTransfTicket",
+						  value: "disabled",
+						  companyId: 1,
+						  createdAt: new Date(),
+						  updatedAt: new Date(),
+						  
+						},
+						
+ ==============================================================================================
+ 
+ Colocar na pasta o respectivo arquivo:
+ 
+/backend/src/services/SettingServices/ListSettingsServiceOne.ts
+
+================================================================================================
+
+Add esses dois dados no arquivo UpdateTicketService.ts
+Abaixo da Linha 14
+
+import ListSettingsServiceOne from "../SettingServices/ListSettingsServiceOne"; //NOVO PLW DESIGN//
+import ShowUserService from "../UserServices/ShowUserService"; //NOVO PLW DESIGN//

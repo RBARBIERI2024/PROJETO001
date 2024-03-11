@@ -1,0 +1,39 @@
+Correção Upload Dark Mode ✅
+
+Editar o arquivo frontend/src/App.js adicionado o código:
+mediainput: mode === "light" ? "#ededed" : "#1c1c1c",
+
+Editar o arquivo frontend/src/components/MessageInputCustom.js adicionado o código:
+Linha 84: backgroundColor: theme.palette.mediainput, //DARK MODE PLW DESIGN//
+
+====================================================================================
+
+Correção Botões "Download" Dark Mode ✅ (Quando enviamos algo o botão fica transparente no modo dark).
+
+Editar o arquivo frontend/src/layout/index.js corrigido código:
+Linha 54 à 59:
+
+    backgroundColor: theme.palette.fancyBackground,
+    '& .MuiButton-outlinedPrimary': {
+      color: theme.mode === 'light' ? '#FFF' : '#FFF',
+	  backgroundColor: theme.mode === 'light' ? '#2DDD7F' : '#1c1c1c',
+      //border: theme.mode === 'light' ? '1px solid rgba(0 124 102)' : '1px solid rgba(255, 255, 255, 0.5)',
+    },
+
+====================================================================================
+
+Fila de Transferência ✅ (Automático)
+
+Faça backup dos arquivos antes de fazer upload dos novos.
+Renomeia os antigos para Exemplo: WhatsAppController_OLD.ts
+
+WhatsAppController.ts
+Whatsapp.ts
+CreateWhatsAppService.ts
+UpdateWhatsAppService.ts
+frontend/src/components/WhatsAppModal/
+frontend/src/components/QueueSelect/
+server.ts
+package.json
+
+====================================================================================

@@ -1,0 +1,27 @@
+Coloque baixo da linha 24:
+import NotificationsVolume from "../components/NotificationsVolume"; //VOLUME PLW DESIGN//
+
+Coloque baixo da linha 186: /frontend/src/layout/index.js
+const [volume, setVolume] = useState(localStorage.getItem("volume") || 1); //VOLUME PLW DESIGN//
+
+Jogar pasta NotificationsVolume aqui:
+/frontend/src/components
+
+/frontend/src/components/NotificationsPopOver
+
+Procurar por const NotificationsPopOver = () => {
+
+Alterar para const NotificationsPopOver = ({ volume }) => {
+
+Procurar por const [play] = useSound(alertSound);
+
+Alterar por const [play] = useSound(alertSound, { volume, });
+
+index.js (Layout) abaixo da linha 280
+          <NotificationsVolume
+            setVolume={setVolume}
+            volume={volume}
+          />
+Procurar por NotificationsPopOver e Add volume={volume} 	   
+
+		  {user.id && <NotificationsPopOver volume={volume} />}

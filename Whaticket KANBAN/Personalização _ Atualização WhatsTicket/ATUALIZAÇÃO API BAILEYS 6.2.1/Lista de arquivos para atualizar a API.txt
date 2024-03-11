@@ -1,0 +1,19 @@
+No arquivo /backend/package.json altere "@adiwajshing/baileys": "5.0.0", para "@whiskeysockets/baileys": "6.2.1",
+
+Altere esses 13 arquivos onde tem a referência:
+import { XXX } from "@adiwajshing/baileys"; para import { XXX } from "@whiskeysockets/baileys";
+
+src/helpers/GetTicketWbot.ts:1
+src/helpers/GetWbotMessage.ts:1
+src/helpers/SetTicketMessagesAsRead.ts:1
+src/helpers/authState.ts:5
+src/helpers/authStateLegacy.ts:5
+src/libs/wbot.ts:10
+src/services/BaileysChatServices/CreateOrUpdateBaileysChatService.ts:1
+src/services/BaileysServices/CreateOrUpdateBaileysService.ts:1
+src/services/WbotServices/DeleteWhatsAppMessage.ts:1
+src/services/WbotServices/SendWhatsAppMedia.ts:1
+src/services/WbotServices/SendWhatsAppMessage.ts:1
+src/services/WbotServices/wbotMessageListener.ts:21
+src/services/WbotServices/wbotMonitor.ts:5
+

@@ -1,0 +1,208 @@
+Antes de rodar todo build rode comando: npm install react-trello
+
+0- Mover arquivo ticketTagRoutes.ts para pasta /backend/src/routes/
+0.1- Mover arquivo TicketTagController.ts para pasta /backend/src/controllers
+
+/backend/src/controllers/TagController.ts
+
+1- Colar abaixo da linha 12:
+
+import KanbanListService from "../services/TagServices/KanbanListService"
+
+2- Linha 34 adcionar kanban ficando desta forma:
+
+const { name, color, kanban } = req.body;
+
+3- Linha 39 de ENTER adcionar kanban ficando desta forma:
+OBS: Não esqueça da virgula.
+
+  const tag = await CreateService({
+    name,
+    color,
+	kanban,
+    companyId
+  });
+
+4- Linha 108 adicionar o seguinte código:
+De Enter para ficar organizado.
+
+export const kanban = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.user;
+
+  const tags = await KanbanListService({ companyId });
+  //console.log(tags);
+  return res.json({lista:tags});
+};
+=================================================================================
+
+/backend/src/controllers/TicketController.ts
+
+5- Enter na linha 10 e adicione o código:
+
+import ListTicketsServiceKanban from "../services/TicketServices/ListTicketsServiceKanban";
+
+6- Dois Enter na linha 83 e adcionar:
+
+export const kanban = async (req: Request, res: Response): Promise<Response> => {
+  const {
+    pageNumber,
+    status,
+    date,
+    updatedAt,
+    searchParam,
+    showAll,
+    queueIds: queueIdsStringified,
+    tags: tagIdsStringified,
+    users: userIdsStringified,
+    withUnreadMessages
+  } = req.query as IndexQuery;
+
+
+  const userId = req.user.id;
+  const { companyId } = req.user;
+
+  let queueIds: number[] = [];
+  let tagsIds: number[] = [];
+  let usersIds: number[] = [];
+
+
+  if (queueIdsStringified) {
+    queueIds = JSON.parse(queueIdsStringified);
+  }
+
+  if (tagIdsStringified) {
+    tagsIds = JSON.parse(tagIdsStringified);
+  }
+
+  if (userIdsStringified) {
+    usersIds = JSON.parse(userIdsStringified);
+  }
+
+
+  const { tickets, count, hasMore } = await ListTicketsServiceKanban({
+    searchParam,
+    tags: tagsIds,
+    users: usersIds,
+    pageNumber,
+    status,
+    date,
+    updatedAt,
+    showAll,
+    userId,
+    queueIds,
+    withUnreadMessages,
+    companyId
+
+  });
+
+  //console.log("ticket controller 82");
+  
+  return res.status(200).json({ tickets, count, hasMore });
+};
+
+=================================================================================
+
+7- Mover arquivo TicketTagController.ts para pasta \backend\src\controllers\
+
+=================================================================================
+
+8- Mover arquivo 20230723301001-add-kanban-to-Tags.ts para pasta \backend\src\database\migrations\
+
+=================================================================================
+
+/backend/src/models/Tag.ts
+
+9- Enter na linha 48 e cole:
+
+  @Column
+  kanban: number;
+  
+=================================================================================
+
+/backend/src/routes/tagRoutes.ts
+
+10- Dê Enter na linha 8 e adicione:
+
+tagRoutes.get("/tags/kanban", isAuth, TagController.kanban);
+
+=================================================================================
+
+/backend/src/routes/ticketRoutes.ts
+
+11- Dê Enter na linha 8 e adicione:
+
+ticketRoutes.get("/tickets/kanban", isAuth, TicketController.kanban);
+
+=================================================================================
+
+backend/src/services/TagServices/CreateService.ts
+
+12- Dê Enter na linha 8 e adc:
+
+kanban: string;
+
+13- Dê Enter na linha 15 e adc: 
+
+kanban,
+
+14- Da linha 29 a 32 e adc: 
+
+  const [tag] = await Tag.findOrCreate({
+    where: { name, color, kanban, companyId },
+    defaults: { name, color, kanban, companyId }
+  });
+  
+15- Mover arquivo KanbanListService.ts para backend\src\services\TagServices\
+
+16- backend/src/services/TagServices/ListService.ts
+Dê Enter na linha 31 e cole: { kanban: { [Op.like]: `%${searchParam}%` } }
+
+17- backend/src/services/TagServices/ListService.ts
+Dê Enter na linha 52 e cole: 'kanban',
+
+18- backend/src/services/TagServices/SimpleListService.ts
+Dê Enter na linha 21 e cole: { kanban: { [Op.like]: `%${searchParam}%` } }
+
+19- backend/src/services/TagServices/UpdateService.ts
+Dê Enter na linha 10 e cole: kanban?: string;
+
+20- backend/src/services/TagServices/UpdateService.ts
+Remova o antigo e cole o novo linha 29: const { name, color, kanban } = tagData;
+
+21- backend/src/services/TagServices/UpdateService.ts
+Dê Enter na linha 39 e cole: kanban
+
+22- Mover arquivo ListTicketsServiceKanban.ts para pasta \backend\src\services\TicketServices\
+
+23- /backend/src/routes/index.ts
+
+Dê Enter na linha 28 e cole: import ticketTagRoutes from "./ticketTagRoutes";
+Dê Enter na linha 45 e cole: routes.use(ticketTagRoutes);
+
+=================================================================================
+
+/frontend/src/components/TagModal/index.js (Remova o antigo e coloque o novo index.js)
+
+26- \frontend\src\layout\MainListItems.js:
+
+Na linha 30 dê Enter e cole: import TableChartIcon from '@material-ui/icons/TableChart';
+
+Dê Enter na linha 238 e cole:
+
+      <ListItemLink
+        to="/kanban"
+        primary={i18n.t("Kanban")}
+        icon={<TableChartIcon />}
+      />
+
+27- Move pasta Kanban para \frontend\src\pages\
+
+28- Trocque o index.js da pasta pelo novo \frontend\src\pages\Tags
+
+				  
+29- /frontend/src/routes/index.js
+Dê Enter na linha 33 e cole: import kanban from "../pages/Kanban";		
+Dê Enter na linha 84 e cole: <Route exact path="/kanban" component={kanban} isPrivate />	  
+
+30- Novo Dashboard renomar pasta Dashboard para Dashboard_Backup que se encontra na pasta Pages
+e colocar a nova pasta.
